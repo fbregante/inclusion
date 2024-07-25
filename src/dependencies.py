@@ -19,7 +19,7 @@ def get_symbol_and_dependencies(symbol, tree):
     dependencies = get_dependencies_in_text(symbol, symbol_node)
     # recursion
     for d in dependencies:
-        nodes.union(get_symbol_and_dependencies(str(d, "utf8"), tree))
+        nodes.update(get_symbol_and_dependencies(str(d, "utf8"), tree))
     # return nodes
     return nodes
 
@@ -29,7 +29,7 @@ def get_symbol_node(symbol, tree):
 
     definition_node_types = [
         "trait_definition",
-        "trait_usage",
+        # "trait_usage", # Don't see the case where this is needed
         "token_definition",
         "constant_definition",
         "variable_definition",
@@ -80,7 +80,19 @@ def get_dependencies_in_text(symbol, node):
             captures = query.captures(node)
             for c in captures:
                 dependencies.add(c[0].text)
-
+        # case "token_definition":
+        #     pass
+        case "constant_definition":
+            assert cursor.goto_last_child()
+            assert cursor.goto_previous_sibling()
+            query = LANGUAGE.query(
+                """
+                (identifier) @dependency
+                """
+            )
+            captures = query.captures(cursor.node)
+            for c in captures:
+                dependencies.add(c[0].text)
 
     return dependencies
    
