@@ -4,7 +4,7 @@
 (define-map token-count uint uint)
 
 (define-constant OWNER u0)
-(define-constant ERR_UNAUTHORIZED (err 13001))
+(define-constant ERR_UNAUTHORIZED (err u13001))
 
 (try! (nft-mint? auth {user: OWNER, count: u0} tx-sender))
 (map-insert user-count OWNER u0)
