@@ -83,16 +83,20 @@ def get_dependencies_in_text(symbol, node):
         # case "token_definition":
         #     pass
         case "constant_definition":
-            assert cursor.goto_last_child()
-            assert cursor.goto_previous_sibling()
-            query = LANGUAGE.query(
-                """
-                (identifier) @dependency
-                """
-            )
+            assert cursor.goto_last_child() and cursor.goto_previous_sibling()
+            query = LANGUAGE.query("(identifier) @dependency")
             captures = query.captures(cursor.node)
             for c in captures:
                 dependencies.add(c[0].text)
-
+        case "variable_definition":
+            assert cursor.goto_last_child() and cursor.goto_previous_sibling()
+            query = LANGUAGE.query("(identifier) @dependency")
+            captures = query.captures(cursor.node)
+            for c in captures:
+                dependencies.add(c[0].text)
+        case "mapping_definition":
+            pass
+        case "function_definition":
+            pass
+            
     return dependencies
-   
