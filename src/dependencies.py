@@ -1,11 +1,12 @@
 import tree_sitter_clarity as tsclarity
 from tree_sitter import Language, Parser
 
+LANGUAGE = Language(tsclarity.language())
+
 class RequirementError(Exception):
     pass
 
 def require(symbol, file_content):
-    LANGUAGE = Language(tsclarity.language())
     parser = Parser(LANGUAGE)
     tree = parser.parse(bytes(file_content, "utf8"))
     return get_symbol_and_dependencies(symbol, tree)
@@ -18,7 +19,7 @@ def get_symbol_and_dependencies(symbol, tree):
     dependencies = get_dependencies_in_text(symbol, symbol_node)
     # recursion
     for d in dependencies:
-        nodes.union(get_symbol_and_dependencies(d, tree))
+        nodes.union(get_symbol_and_dependencies(str(d, "utf8"), tree))
     # return nodes
     return nodes
 
@@ -60,11 +61,26 @@ def get_symbol_node(symbol, tree):
                     if cursor.node.type == root_type:
                         searching = False
 
-        assert cursor.goto_next_sibling()
+        if not cursor.goto_next_sibling():
+            raise RequirementError(f"Symbol '{symbol}' not found.")
                   
-    raise RequirementError(f"Symbol '{symbol}' not found.")
 
 def get_dependencies_in_text(symbol, node):
     cursor = node.walk()
-    return []
-  
+    dependencies = set()
+    match node.type:
+        case "trait_definition":
+            # We only need to look at the parameters for more traits
+            # Queries are simple to use here
+            query = LANGUAGE.query(
+                """
+                (trait_type (identifier) @dependency)
+                """
+            )
+            captures = query.captures(node)
+            for c in captures:
+                dependencies.add(c[0].text)
+
+
+    return dependencies
+   
