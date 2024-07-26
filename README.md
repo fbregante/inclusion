@@ -89,4 +89,7 @@ Module with other utility functions.
 
 ## Roadmap
 
-- [ ] Implement `require` directive (need TS).
+- [x] Implement `include` directive
+- [x] Implement `require` directive (need TS).
+- [ ] Remove comments from library code and generate it once in the preprocessor
+- [ ] Automated test suite
