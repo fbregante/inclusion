@@ -3,15 +3,18 @@ from tree_sitter import Language, Parser, Node, Tree
 
 LANGUAGE = Language(tsclarity.language())
 
+
 class RequirementError(Exception):
     pass
 
-def get_definitions(symbols:list[str], file_content:str) -> set[Node]:
+
+def get_definitions(symbols: list[str], file_content: str) -> set[Node]:
     parser = Parser(LANGUAGE)
     tree = parser.parse(bytes(file_content, "utf8"))
     return get_symbol_and_dependencies(symbols, tree)
 
-def get_symbol_and_dependencies(symbols:list[str], tree:Tree) -> set[Node]:
+
+def get_symbol_and_dependencies(symbols: list[str], tree: Tree) -> set[Node]:
     nodes = set()
     for symbol in symbols:
         # Get top-level node where the symbol is defined
@@ -28,7 +31,8 @@ def get_symbol_and_dependencies(symbols:list[str], tree:Tree) -> set[Node]:
     # Return nodes
     return nodes
 
-def get_symbol_node(symbol:str, tree:Tree) -> Node:
+
+def get_symbol_node(symbol: str, tree: Tree) -> Node:
     definition_node_types = [
         "trait_definition",
         # "trait_usage", # Don't see the case where this is needed
@@ -36,7 +40,7 @@ def get_symbol_node(symbol:str, tree:Tree) -> Node:
         "constant_definition",
         "variable_definition",
         "mapping_definition",
-        "function_definition"
+        "function_definition",
     ]
 
     cursor = tree.walk()
@@ -80,9 +84,9 @@ def get_symbol_node(symbol:str, tree:Tree) -> Node:
 
         if not cursor.goto_next_sibling():
             raise RequirementError(f"Symbol '{symbol}' not found.")
-                  
 
-def get_dependencies_in_text(symbol:str, node:Node) -> set[str]:
+
+def get_dependencies_in_text(symbol: str, node: Node) -> set[str]:
     cursor = node.walk()
     dependencies = set()
     match node.type:
@@ -119,30 +123,38 @@ def get_dependencies_in_text(symbol:str, node:Node) -> set[str]:
             # Get dependencies from signature
             local_bindings = set()
             query = LANGUAGE.query(
-            """
+                """
                 (parameter_type
                     (trait_type
                         (identifier) @dependency))                                       
-            """)
+            """
+            )
             # We query identifiers in tuple keys for removing it later from the result
             captures = query.captures(cursor.node)
             query = LANGUAGE.query(
-            """
+                """
                 (tuple_lit
                     key: (identifier) @named_key)
-            """)
+            """
+            )
             tuple_keys = set()
-            for n, _ in  query.captures(cursor.node):
+            for n, _ in query.captures(cursor.node):
                 tuple_keys.add(n.text)
             # Move to function body
-            assert cursor.goto_first_child() and cursor.goto_last_child() and cursor.goto_previous_sibling()
+            assert (
+                cursor.goto_first_child()
+                and cursor.goto_last_child()
+                and cursor.goto_previous_sibling()
+            )
             # If this is a let expression, we need to consider local bindings
             if cursor.node.type == "let_expression":
                 # Move to where local bindings start
-                assert (cursor.goto_first_child() and
-                cursor.goto_next_sibling() and
-                cursor.goto_next_sibling() and
-                cursor.goto_next_sibling())
+                assert (
+                    cursor.goto_first_child()
+                    and cursor.goto_next_sibling()
+                    and cursor.goto_next_sibling()
+                    and cursor.goto_next_sibling()
+                )
 
                 # Iterate over local bindings
                 while cursor.node.type == "local_binding":
@@ -166,7 +178,7 @@ def get_dependencies_in_text(symbol:str, node:Node) -> set[str]:
 
             for c in captures:
                 # Remove tuple keys and local bindings
-                if not c[0].text in ignore_identifiers:
+                if c[0].text not in ignore_identifiers:
                     dependencies.add(c[0].text)
-            
+
     return dependencies

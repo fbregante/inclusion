@@ -1,5 +1,6 @@
 import sys
-import preprocessor
+from preprocessor import process_file, PreprocessorError
+
 
 def main():
     if len(sys.argv) != 3:
@@ -10,11 +11,12 @@ def main():
     output_file = sys.argv[2]
 
     try:
-        preprocessor.process_file(input_file, output_file)
+        process_file(input_file, output_file)
         print(f"Preprocessed {input_file} and saved to {output_file}")
     except PreprocessorError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

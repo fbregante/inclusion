@@ -3,41 +3,51 @@ import os
 
 import requirements
 
+
 class PreprocessorError(Exception):
     pass
 
-def read_library(library_name:str) -> str:
+
+def read_library(library_name: str) -> str:
     filename = os.path.join("clarity_libs", f"{library_name}.clar")
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             content = file.read()
         return content.strip()
     except FileNotFoundError:
         raise PreprocessorError(f"Library file '{filename}' not found")
 
-def process_file(input_filename:str, output_filename:str) -> None:
+
+def process_file(input_filename: str, output_filename: str) -> None:
     included_libraries = set()
     libraries = {}
 
-    with open(input_filename, 'r') as infile, open(output_filename, 'w') as outfile:
+    with open(input_filename, "r") as infile, open(output_filename, "w") as outfile:
         for line in infile:
-            if line.strip().startswith(';;'):
+            if line.strip().startswith(";;"):
                 # Check if this comment is a directive
-                include_match = re.match(r';;\ *#include\(([-\w0-9]+)\)', line.strip())
-                require_match = re.match(r';;\ *#require\(([-\w0-9]+)\)\[([-\w0-9,\s_]*)\]', line.strip())
+                include_match = re.match(r";;\ *#include\(([-\w0-9]+)\)", line.strip())
+                require_match = re.match(
+                    r";;\ *#require\(([-\w0-9]+)\)\[([-\w0-9,\s_]*)\]", line.strip()
+                )
 
-                if include_match == None and require_match == None:
+                any_match = include_match or require_match
+                if any_match is None:
                     outfile.write(line)  # Keep comments that are not directives
                     continue
 
-                library_name = (include_match or require_match).group(1)
+                library_name = any_match.group(1)
                 if library_name in included_libraries:
-                    raise PreprocessorError(f"Already included library '{library_name}': {str(e)}")
+                    raise PreprocessorError(
+                        f"Already included library '{library_name}'"
+                    )
                 if library_name not in libraries:
                     try:
                         libraries[library_name] = read_library(library_name)
                     except PreprocessorError as e:
-                        raise PreprocessorError(f"Error including library '{library_name}': {str(e)}")
+                        raise PreprocessorError(
+                            f"Error including library '{library_name}': {str(e)}"
+                        )
 
                 included_libraries.add(library_name)
                 library_content = libraries[library_name]
@@ -54,4 +64,3 @@ def process_file(input_filename:str, output_filename:str) -> None:
                 outfile.write(f"\n;; </{library_name}>\n")
             else:
                 outfile.write(line)
-
