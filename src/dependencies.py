@@ -94,9 +94,54 @@ def get_dependencies_in_text(symbol, node):
             captures = query.captures(cursor.node)
             for c in captures:
                 dependencies.add(c[0].text)
-        case "mapping_definition":
-            pass
+        # case "mapping_definition":
+        #     pass
         case "function_definition":
-            pass
+            # Get dependencies from signature
+            print(node)
+            print()
+            local_bindings = set()
+            query = LANGUAGE.query(
+            """
+                (parameter_type
+                    (trait_type
+                        (identifier) @dependency))                                       
+            """)
+            captures = query.captures(cursor.node)
+            query = LANGUAGE.query(
+            """
+                (tuple_lit
+                    key: (identifier) @named_key)
+            """)
+            tuple_keys = set()
+            for n, _ in  query.captures(cursor.node):
+                tuple_keys.add(n.text)
+            # Get dependencies in local bindings
+            assert cursor.goto_first_child()
+            assert cursor.goto_last_child() and cursor.goto_previous_sibling()
+            if cursor.node.type == "let_expression":
+                assert (cursor.goto_first_child() and
+                cursor.goto_next_sibling() and
+                cursor.goto_next_sibling() and
+                cursor.goto_next_sibling())
+
+                while cursor.node.type == "local_binding":
+                    cursor.goto_first_child() and cursor.goto_next_sibling()
+                    local_bindings.add(cursor.node.text)
+                    cursor.goto_next_sibling()
+                    query = LANGUAGE.query("(identifier) @dependency")
+                    captures += query.captures(cursor.node)
+                    cursor.goto_parent() and cursor.goto_next_sibling()
+
+            while cursor.goto_next_sibling():
+                query = LANGUAGE.query("(identifier) @dependency")
+                captures += query.captures(cursor.node)
+
+            # Get dependencies in the rest of the body
+            ignore_identifiers = tuple_keys | local_bindings
+            for c in captures:
+                if not c[0].text in ignore_identifiers:
+                    dependencies.add(c[0].text)
             
     return dependencies
+
