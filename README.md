@@ -5,12 +5,15 @@ Inclusion is a tool developed by @Coinfabrik for managing libraries in the Clari
 
 ## Disclaimer
 
-**ALWAYS review the generated code** before actually using it. This is an immature tool and the generated code is written in a high-level language you already know. It's not gonna take you that long.
+**ALWAYS review the generated code** before actually using it. 
+
+This is an immature tool and the generated code is written in a high-level language you already know. It's not gonna take you that long.
 
 
 ## Usage
 
 Inclusion's preprocessor identifies directives in comments.
+
 Directives are denoted by the prefix "#".
 
 
