@@ -3,6 +3,11 @@
 Inclusion is a tool developed by @Coinfabrik for managing libraries in the Clarity smart contract language.
 
 
+## Disclaimer
+
+*ALWAYS review the generated code* before actually using it. This is an immature tool and the generated code is written in a high-level language you already know. It's not gonna take you that long.
+
+
 ## Usage
 
 Inclusion's preprocessor identifies directives in comments.
@@ -89,5 +94,6 @@ Module with other utility functions.
 
 - [x] Implement `include` directive
 - [x] Implement `require` directive (need TS).
-- [ ] Project setup and wheel dist
+- [x] Project setup and wheel dist
+- [ ] Code refactor
 - [ ] Automated test suite
