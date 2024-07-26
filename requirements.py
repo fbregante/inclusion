@@ -6,20 +6,25 @@ LANGUAGE = Language(tsclarity.language())
 class RequirementError(Exception):
     pass
 
-def require(symbol, file_content):
+def get_definitions(symbols, file_content):
     parser = Parser(LANGUAGE)
     tree = parser.parse(bytes(file_content, "utf8"))
-    return get_symbol_and_dependencies(symbol, tree)
+    return get_symbol_and_dependencies(symbols, tree)
 
-def get_symbol_and_dependencies(symbol, tree):
-    # find symbol
-    symbol_node = get_symbol_node(symbol, tree)
-    nodes = set([symbol_node])
-    # get its dependencies
-    dependencies = get_dependencies_in_text(symbol, symbol_node)
-    # recursion
-    for d in dependencies:
-        nodes.update(get_symbol_and_dependencies(str(d, "utf8"), tree))
+def get_symbol_and_dependencies(symbols, tree):
+    nodes = set()
+    for symbol in symbols:
+        # find symbol
+        symbol_node = get_symbol_node(symbol, tree)
+        nodes.add(symbol_node)
+        # get its dependencies
+        dependencies = get_dependencies_in_text(symbol, symbol_node)
+        # recursion
+        for d in dependencies:
+            nodes.update(get_symbol_and_dependencies(str(d, "utf8"), tree))
+    # sort nodes by start point row
+    nodes = sorted(nodes, key=lambda x: x.start_point.row)
+    
     # return nodes
     return nodes
 
@@ -98,8 +103,6 @@ def get_dependencies_in_text(symbol, node):
         #     pass
         case "function_definition":
             # Get dependencies from signature
-            print(node)
-            print()
             local_bindings = set()
             query = LANGUAGE.query(
             """
@@ -144,4 +147,3 @@ def get_dependencies_in_text(symbol, node):
                     dependencies.add(c[0].text)
             
     return dependencies
-

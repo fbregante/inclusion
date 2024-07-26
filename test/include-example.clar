@@ -1,6 +1,7 @@
-;; #include(coinfabrik-utils)
+;; #include(coinfabrik-auth)
 
-(define-read-only (rewards-per-burn-block (rewards uint))
-  (/ rewards BURN_BLOCKS_IN_YEAR)    
-)
-
+(define-public (withdraw (amount uint))
+	(let 
+		((caller (tx-sender)))
+		(try! (check-is-owner)
+		(as-contract (stx-transfer? amount tx-sender caller)))))
