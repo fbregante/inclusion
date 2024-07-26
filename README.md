@@ -43,7 +43,7 @@ Output:
 ```
 
 
-### Require (not implemented)
+### Require
 
 Require is a selective inclusion. Only the specified symbols (and its dependencies) will be included.
 
@@ -59,8 +59,6 @@ Input:
 Output:
 ```clar
 ;; <coinfabrik-utils>
-;; License ...
-;; CoinFabrik Libraries (v0.0.1)
 (define-constant BURN_BLOCKS_IN_YEAR u52560)
 ;; </coinfabrik-utils>
 
