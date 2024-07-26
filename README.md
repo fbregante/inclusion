@@ -89,5 +89,5 @@ Module with other utility functions.
 
 - [x] Implement `include` directive
 - [x] Implement `require` directive (need TS).
-- [ ] Remove comments from library code and generate it once in the preprocessor
+- [ ] Project setup and wheel dist
 - [ ] Automated test suite

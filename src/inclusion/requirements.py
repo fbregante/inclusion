@@ -22,6 +22,7 @@ def get_symbol_and_dependencies(symbols, tree):
         # recursion
         for d in dependencies:
             nodes.update(get_symbol_and_dependencies(str(d, "utf8"), tree))
+
     # sort nodes by start point row
     nodes = sorted(nodes, key=lambda x: x.start_point.row)
     
