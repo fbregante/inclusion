@@ -1,5 +1,5 @@
 import sys
-import inclusion.preprocessor
+import preprocessor
 
 def main():
     if len(sys.argv) != 3:
@@ -17,4 +17,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    inclusion.main()
+    main()

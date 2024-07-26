@@ -10,7 +10,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 keywords = ["library", "clarity", "stacks", "coinfabrik"]
 
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
   "tree-sitter",
   "ts-clarity>=0.0.5",

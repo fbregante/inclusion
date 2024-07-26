@@ -1,12 +1,12 @@
 import re
 import os
 
-import inclusion.requirements
+import requirements
 
 class PreprocessorError(Exception):
     pass
 
-def read_library(library_name):
+def read_library(library_name:str) -> str:
     filename = os.path.join("clarity_libs", f"{library_name}.clar")
     try:
         with open(filename, 'r') as file:
@@ -15,7 +15,7 @@ def read_library(library_name):
     except FileNotFoundError:
         raise PreprocessorError(f"Library file '{filename}' not found")
 
-def process_file(input_filename, output_filename):
+def process_file(input_filename:str, output_filename:str) -> None:
     included_libraries = set()
     libraries = {}
 
@@ -30,7 +30,7 @@ def process_file(input_filename, output_filename):
                     outfile.write(line)  # Keep comments that are not directives
                     continue
 
-                library_name = include_match.group(1)
+                library_name = (include_match or require_match).group(1)
                 if library_name in included_libraries:
                     raise PreprocessorError(f"Already included library '{library_name}': {str(e)}")
                 if library_name not in libraries:
