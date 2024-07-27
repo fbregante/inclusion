@@ -98,5 +98,5 @@ Module with other utility functions.
 - [x] Implement `include` directive
 - [x] Implement `require` directive (need TS).
 - [x] Project setup and wheel dist
-- [ ] Code refactor
+- [x] Code refactor
 - [ ] Automated test suite
