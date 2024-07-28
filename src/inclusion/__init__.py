@@ -1,5 +1,6 @@
 import sys
 from preprocessor import Preprocessor, PreprocessorError
+from libs import *
 
 
 def main():
@@ -11,7 +12,7 @@ def main():
     output_file = sys.argv[2]
 
     try:
-        Preprocessor({}).process_file(input_file, output_file)
+        Preprocessor(HEADER, LIBRARIES).process_file(input_file, output_file)
         print(f"Preprocessed {input_file} and saved to {output_file}")
     except PreprocessorError as e:
         print(f"Error: {e}", file=sys.stderr)

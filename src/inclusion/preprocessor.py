@@ -9,7 +9,8 @@ class PreprocessorError(Exception):
 
 
 class Preprocessor:
-    def __init__(self, libraries):
+    def __init__(self, header:str, libraries:dict[str,str]):
+        self.header = header
         self.libraries = libraries
         self.included_libraries = []
 
@@ -32,7 +33,8 @@ class Preprocessor:
                 library_content = self.fetch_library(library_name)
 
                 # Write opening tag
-                outfile.write(f";; <{library_name}>\n")
+                outfile.write(f";; <{library_name}>")
+                outfile.write(f"{self.header}")
                 # Determine which directive is and process it
                 if include_match:
                     outfile.write(library_content)
@@ -53,18 +55,8 @@ class Preprocessor:
             raise PreprocessorError(f"Already included library '{library_name}'")
         if library_name not in self.libraries:
             try:
-                self.libraries[library_name] = self.read_library(library_name)
-            except PreprocessorError as e:
-                raise PreprocessorError(
-                    f"Error including library '{library_name}': {str(e)}"
-                )
+                with open(filename, "r") as file:
+                   self.libraries[library_name] = file.read().strip()
+            except FileNotFoundError:
+                raise PreprocessorError(f"Library file '{filename}' not found")
         return self.libraries[library_name]
-
-    def read_library(self, library_name: str) -> str:
-        filename = os.path.join("clarity_libs", f"{library_name}.clar")
-        try:
-            with open(filename, "r") as file:
-                content = file.read()
-            return content.strip()
-        except FileNotFoundError:
-            raise PreprocessorError(f"Library file '{filename}' not found")
