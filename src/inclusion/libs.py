@@ -1,14 +1,12 @@
 # In the future, this should be a reporsitory from which we download these official libraries.
 # But, this is a simple solution for packaging the tool and share it with others.
 
-HEADER = (
-""";; License ...
+HEADER = """;; License ...
 ;; CoinFabrik Libraries (v0.0.1)"""
-)
 
 LIBRARIES = {
     "coinfabrik-auth": (
-"""(define-non-fungible-token auth {user: uint, count: uint})
+        """(define-non-fungible-token auth {user: uint, count: uint})
 (define-map token-count uint uint)
 
 (define-constant OWNER u0)
@@ -25,7 +23,7 @@ LIBRARIES = {
         (ok true)))"""
     ),
     "coinfabrik-math": (
-"""(define-constant ONE_IN_FIXED u100000000)
+        """(define-constant ONE_IN_FIXED u100000000)
 (define-constant ONE_IN_FIXED_SIGNED 100000000)
 (define-constant FIXED_PRECISION u8)
 
@@ -45,7 +43,7 @@ LIBRARIES = {
   (/ (+ (* x ONE_IN_FIXED_SIGNED) (/ y 2)) y))"""
     ),
     "coinfabrik-utils": (
-""";; (* u365 u24 u60 u60)
+        """;; (* u365 u24 u60 u60)
 (define-constant SECONDS_IN_YEAR u31536000)
 ;; (* u10 u60)
 (define-constant SECONDS_IN_BURN_BLOCK u600)

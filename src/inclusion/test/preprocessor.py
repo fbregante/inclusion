@@ -19,14 +19,13 @@ class TestPreprocessor(unittest.TestCase):
         infile.write(";; #include(testlib)\n")
         infile.seek(0)
 
-        preprocessor = Preprocessor(libraries= {"testlib": "(define-constant TEST u2)"})
+        preprocessor = Preprocessor(libraries={"testlib": "(define-constant TEST u2)"})
         preprocessor.process_stream(infile, outfile)
 
         outfile.seek(0)
         result = outfile.read()
         self.assertEqual(
-            result,
-            ";; <testlib>\n(define-constant TEST u2)\n;; </testlib>\n"
+            result, ";; <testlib>\n(define-constant TEST u2)\n;; </testlib>\n"
         )
 
     def test_with_header(self):
@@ -35,14 +34,16 @@ class TestPreprocessor(unittest.TestCase):
         infile.write(";; #include(testlib)\n")
         infile.seek(0)
 
-        preprocessor = Preprocessor(";; HEADER", {"testlib": "(define-constant TEST u2)"})
+        preprocessor = Preprocessor(
+            ";; HEADER", {"testlib": "(define-constant TEST u2)"}
+        )
         preprocessor.process_stream(infile, outfile)
 
         outfile.seek(0)
         result = outfile.read()
         self.assertEqual(
             result,
-            ";; <testlib>\n;; HEADER\n(define-constant TEST u2)\n;; </testlib>\n"
+            ";; <testlib>\n;; HEADER\n(define-constant TEST u2)\n;; </testlib>\n",
         )
 
     def test_require(self):
@@ -51,16 +52,14 @@ class TestPreprocessor(unittest.TestCase):
         infile.write(";; #require(testlib)[TEST]\n")
         infile.seek(0)
 
-        preprocessor = Preprocessor(libraries= {"testlib": "(define-constant TEST u2)"})
+        preprocessor = Preprocessor(libraries={"testlib": "(define-constant TEST u2)"})
         preprocessor.process_stream(infile, outfile)
 
         outfile.seek(0)
         result = outfile.read()
         self.assertEqual(
-            result,
-            ";; <testlib>\n(define-constant TEST u2)\n;; </testlib>\n"
+            result, ";; <testlib>\n(define-constant TEST u2)\n;; </testlib>\n"
         )
-
 
 
 if __name__ == "__main__":

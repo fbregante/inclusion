@@ -35,7 +35,8 @@ class Preprocessor:
 
             # Write opening tag
             output_stream.write(f";; <{library_name}>\n")
-            if self.header: output_stream.write(f"{self.header}\n")
+            if self.header:
+                output_stream.write(f"{self.header}\n")
             # Determine which directive is and process it
             if include_match:
                 output_stream.write(library_content)
