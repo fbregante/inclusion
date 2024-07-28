@@ -17,7 +17,7 @@
         (try! (nft-mint? auth {user: OWNER, count: (+ count u1)} tx-sender))
         (map-set token-count OWNER (+ count u1))
         (ok true)))
-    
+
 ;; </coinfabrik-auth>
 
 (define-public (withdraw (amount uint))
