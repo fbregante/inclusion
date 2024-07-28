@@ -1,6 +1,6 @@
 import sys
 from preprocessor import Preprocessor, PreprocessorError
-from libs import *
+from libs import HEADER, LIBRARIES
 
 
 def main():

@@ -1,5 +1,4 @@
 import re
-import os
 
 from requirements import SyntaxTreeSearcher
 
@@ -9,7 +8,7 @@ class PreprocessorError(Exception):
 
 
 class Preprocessor:
-    def __init__(self, header:str, libraries:dict[str,str]):
+    def __init__(self, header: str, libraries: dict[str, str]):
         self.header = header
         self.libraries = libraries
         self.included_libraries = []
@@ -55,8 +54,8 @@ class Preprocessor:
             raise PreprocessorError(f"Already included library '{library_name}'")
         if library_name not in self.libraries:
             try:
-                with open(filename, "r") as file:
-                   self.libraries[library_name] = file.read().strip()
+                with open(library_name, "r") as file:
+                    self.libraries[library_name] = file.read().strip()
             except FileNotFoundError:
-                raise PreprocessorError(f"Library file '{filename}' not found")
+                raise PreprocessorError(f"Library file '{library_name}' not found")
         return self.libraries[library_name]
