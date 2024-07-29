@@ -16,7 +16,11 @@ class SyntaxTreeSearcher:
     ) -> set[Node]:
         tree = self.parser.parse(bytes(file_content, "utf8"))
         nodes = set()
-        for symbol in symbols:
+        i = 0
+        symbols_len = len(symbols)
+        while i < symbols_len:
+            symbol = symbols[i]
+            i += 1
             # Get top-level node where the symbol is defined
             symbol_node = self.get_symbol_node(symbol, tree)
             nodes.add(symbol_node)
@@ -24,7 +28,10 @@ class SyntaxTreeSearcher:
             dependencies = self.get_dependencies_in_text(symbol, symbol_node)
             # Get top-level node of each dependency
             for d in dependencies:
-                nodes.update(self.get_symbol_and_dependencies(str(d, "utf8"), tree))
+                if d in symbols:
+                    continue
+                symbols.append(str(d, "utf8"))
+                symbols_len += 1
 
         # Sort nodes by start point row, so that they are copied keeping its relative order
         nodes = sorted(nodes, key=lambda x: x.start_point.row)
@@ -118,8 +125,8 @@ class SyntaxTreeSearcher:
             # case "mapping_definition": # I think this is not needed
             #     pass
             case "function_definition":
+                ignore_identifiers = set()
                 # Get dependencies from signature
-                local_bindings = set()
                 query = self.language.query(
                     """
                     (parameter_type
@@ -127,17 +134,25 @@ class SyntaxTreeSearcher:
                             (identifier) @dependency))                                       
                 """
                 )
-                # We query identifiers in tuple keys for removing it later from the result
                 captures = query.captures(cursor.node)
+                # Query parameters for ignoring them afterwards
+                query = self.language.query(
+                    """
+                    (function_parameter
+                        (identifier) @parameter)
+                """
+                )
+                for n, _ in query.captures(cursor.node):
+                    ignore_identifiers.add(n.text)
+                # We query identifiers in tuple keys for removing it later from the result
                 query = self.language.query(
                     """
                     (tuple_lit
                         key: (identifier) @named_key)
                 """
                 )
-                tuple_keys = set()
                 for n, _ in query.captures(cursor.node):
-                    tuple_keys.add(n.text)
+                    ignore_identifiers.add(n.text)
                 # Move to function body
                 assert (
                     cursor.goto_first_child()
@@ -158,7 +173,7 @@ class SyntaxTreeSearcher:
                     while cursor.node.type == "local_binding":
                         cursor.goto_first_child() and cursor.goto_next_sibling()
                         # Add local definitions to a set for removing them from final result
-                        local_bindings.add(cursor.node.text)
+                        ignore_identifiers.add(cursor.node.text)
                         cursor.goto_next_sibling()
                         # Get unresolved identifiers from bindings
                         query = self.language.query("(identifier) @dependency")
@@ -166,13 +181,15 @@ class SyntaxTreeSearcher:
                         # Go to the next binding, if any
                         cursor.goto_parent() and cursor.goto_next_sibling()
 
-                # Get dependencies in the rest of the body
-                # A loop might not be required here. Just once should be enough.
-                while cursor.goto_next_sibling():
+                    # Get dependencies in the rest of the body
+                    # A loop might not be required here. Just once should be enough.
+                    while cursor.goto_next_sibling():
+                        query = self.language.query("(identifier) @dependency")
+                        captures += query.captures(cursor.node)
+                else:
+                    # If it isn't a let, there is only one expression
                     query = self.language.query("(identifier) @dependency")
                     captures += query.captures(cursor.node)
-
-                ignore_identifiers = tuple_keys | local_bindings
 
                 for c in captures:
                     # Remove tuple keys and local bindings

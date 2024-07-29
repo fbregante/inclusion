@@ -39,7 +39,7 @@ class Preprocessor:
                 output_stream.write(f"{self.header}\n")
             # Determine which directive is and process it
             if include_match:
-                output_stream.write(library_content)
+                output_stream.write(library_content + "\n")
             else:
                 definitions_required = list(
                     map(str.strip, require_match.group(2).split(","))
@@ -48,9 +48,9 @@ class Preprocessor:
                     definitions_required, library_content
                 )
                 for n in nodes:
-                    output_stream.write(str(n.text, "utf8"))
+                    output_stream.write(f"{str(n.text, "utf8")}\n")
             # Write closing tag
-            output_stream.write(f"\n;; </{library_name}>\n")
+            output_stream.write(f";; </{library_name}>\n")
 
     def fetch_library(self, library_name):
         if library_name not in self.libraries:
