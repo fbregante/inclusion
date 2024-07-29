@@ -1,7 +1,7 @@
 import unittest
 from io import StringIO
 
-from preprocessor import Preprocessor, PreprocessorError
+from inclusion.preprocessor import Preprocessor, PreprocessorError
 
 
 class TestPreprocessor(unittest.TestCase):

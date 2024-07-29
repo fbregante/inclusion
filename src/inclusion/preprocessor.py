@@ -1,6 +1,6 @@
 import re
 
-from requirements import SyntaxTreeSearcher
+from inclusion.requirements import SyntaxTreeSearcher
 
 
 class PreprocessorError(Exception):
