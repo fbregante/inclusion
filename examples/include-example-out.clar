@@ -15,5 +15,5 @@
 (define-public (withdraw (amount uint))
 	(let 
 		((caller (tx-sender)))
-		(try! (check-is-owner)
+		(try! (verify-is-owner)
 		(as-contract (stx-transfer? amount tx-sender caller)))))
