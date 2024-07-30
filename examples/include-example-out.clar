@@ -7,6 +7,9 @@
 
 (define-private (verify-is-owner)
     (unwrap! (ft-burn? auth u1 tx-sender) ERR_UNAUTHORIZED))
+    
+(define-public (transfer-ownership (new-owner principal))
+	(unwrap! (ft-transfer? auth-token (ft-get-supply auth-token) tx-sender new-owner) ERR_UNAUTHORIZED))
 ;; </coinfabrik-auth>
 
 (define-public (withdraw (amount uint))
