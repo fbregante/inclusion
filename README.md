@@ -80,7 +80,7 @@ Output:
 
 ### coinfabrik-auth
 
-Naive solution for authentication in clarity. This keeps `tx-sender` flexibility, but enables post-condition triggering. This is achieved using NFT tokens for authentication. This way, wallets in deny-mode will revert when a transaction is trying to use the authentication token.
+Optimized solution for authentication in clarity. This keeps `tx-sender` flexibility, but enables post-condition triggering. This is achieved using FT tokens for authentication. This way, wallets in deny-mode will revert when a transaction is trying to use the authentication token.
 
 
 ### coinfabrik-math
