@@ -1,21 +1,12 @@
 ;; <coinfabrik-auth>
 ;; License ...
 ;; CoinFabrik Libraries (v0.0.1)
-(define-non-fungible-token auth {user: uint, count: uint})
-(define-map token-count uint uint)
-
-(define-constant OWNER u0)
+(define-fungible-token auth u340282366920938463463374607431768211455)
 (define-constant ERR_UNAUTHORIZED (err u13001))
+(try! (ft-mint? auth u340282366920938463463374607431768211455 tx-sender))
 
-(try! (nft-mint? auth {user: OWNER, count: u0} tx-sender))
-(map-insert user-count OWNER u0)
-
-(define-private (check-is-owner)
-    (let ((count (unwrap-panic (map-get? token-count OWNER))))
-        (unwrap! (nft-burn? auth {user: OWNER, count: count} tx-sender) ERR_UNAUTHORIZED)
-        (try! (nft-mint? auth {user: OWNER, count: (+ count u1)} tx-sender))
-        (map-set token-count OWNER (+ count u1))
-        (ok true)))
+(define-private (verify-is-owner)
+    (unwrap! (ft-burn? auth u1 tx-sender) ERR_UNAUTHORIZED))
 ;; </coinfabrik-auth>
 
 (define-public (withdraw (amount uint))
