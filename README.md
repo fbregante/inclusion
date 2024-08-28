@@ -9,6 +9,8 @@ Inclusion is a tool developed by @Coinfabrik for managing libraries in the Clari
 
 This is an immature tool and the generated code is written in a high-level language you already know. It's not gonna take you that long.
 
+Built-in libraries are just an example and they are not official libraries recommended as good/secure practices.
+
 
 ## Usage
 
